@@ -1,0 +1,333 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── School ───────────────────────────────────────────
+model School {
+  id         String      @id @default(cuid())
+  name       String
+  address    String?
+  phone      String?
+  email      String?
+  logoUrl    String?
+  clerkOrgId String      @unique
+  schoolType SchoolType  @default(BOTH)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  classes        Class[]
+  students        Student[]
+  teachers        Teacher[]
+  sessions        AcademicSession[]
+  activities      SchoolActivity[]
+  departments     Department[]
+  gradingConfig GradingConfig[]
+  subjects       Subject[]
+   principalSignatureUrl String?
+  principalName         String?
+}
+
+enum SchoolType {
+  PRIMARY
+  SECONDARY
+  BOTH
+}
+
+// ─── Academic Session & Term ──────────────────────────
+model AcademicSession {
+  id        String   @id @default(cuid())
+  name      String
+  isCurrent Boolean  @default(false)
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id])
+  createdAt DateTime @default(now())
+
+  terms     Term[]
+}
+
+model Term {
+   id        String          @id @default(cuid())
+  name      String
+  isCurrent Boolean         @default(false)
+  sessionId String
+  session   AcademicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+
+  results     Result[]
+  feePayments FeePayment[]
+  remarks StudentRemark[]
+}
+
+// ─── Class ────────────────────────────────────────────
+enum ClassCategory {
+  PRIMARY
+  JSS
+  SS
+}
+
+model Class {
+  id           String        @id @default(cuid())
+  name         String        // "JSS1A", "Primary 3", "SS2B"
+  category     ClassCategory @default(PRIMARY)
+  level        String?       // "JSS 1", "JSS 2", "SS 1" — parent label for secondary
+  schoolId     String
+  school       School        @relation(fields: [schoolId], references: [id])
+  createdAt    DateTime      @default(now())
+
+  students     Student[]
+  teachers     ClassTeacher[]
+  subjects     Subject[]
+}
+
+// ─── Department (SS only, school-wide) ────────────────
+model Department {
+  id       String  @id @default(cuid())
+  name     String  // "Science", "Arts", "Commercial"
+  schoolId String
+  school   School  @relation(fields: [schoolId], references: [id])
+
+  subjects Subject[]
+
+  @@unique([name, schoolId])
+   studentDepartments StudentDepartment[]
+}
+
+enum TeacherRole {
+  CLASS_TEACHER
+  YEAR_TUTOR
+}
+
+// ─── Teacher ──────────────────────────────────────────
+model Teacher {
+  id          String      @id @default(cuid())
+  clerkUserId String      @unique
+  firstName   String
+  lastName    String
+  email       String
+  schoolId    String
+  school      School      @relation(fields: [schoolId], references: [id])
+  role        TeacherRole @default(CLASS_TEACHER)
+  tutorLevel  String?     // for YEAR_TUTOR e.g. "JSS 1", "SS 2"
+  defaultPassword String? // admin-generated
+  mustChangePassword Boolean @default(true)
+  createdAt   DateTime    @default(now())
+
+  classes     ClassTeacher[]
+  results     Result[]
+  signature   TeacherSignature?
+  remarks     StudentRemark[]
+
+  @@unique([email, schoolId])
+}
+
+model TeacherSignature {
+  id           String   @id @default(cuid())
+  teacherId    String   @unique
+  teacher      Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  signatureUrl String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TeacherOTP {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model StudentRemark {
+  id        String   @id @default(cuid())
+  studentId String
+  termId    String
+  teacherId String
+  remark    String
+  student   Student  @relation(fields: [studentId], references: [id])
+  term      Term     @relation(fields: [termId], references: [id], onDelete: Cascade)
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, termId])
+}
+
+model ClassTeacher {
+  id        String  @id @default(cuid())
+  classId   String
+  teacherId String
+  class     Class   @relation(fields: [classId], references: [id])
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, teacherId])
+}
+
+// ─── Student ──────────────────────────────────────────
+model Student {
+  id             String   @id @default(cuid())
+  clerkUserId    String?  @unique
+  firstName      String
+  lastName       String
+  email          String
+  studentId      String
+  classId        String
+  schoolId       String
+  defaultPassword String? // admin-set, cleared after first login
+  mustChangePassword Boolean @default(true)
+  class          Class    @relation(fields: [classId], references: [id])
+  school         School   @relation(fields: [schoolId], references: [id])
+  createdAt      DateTime @default(now())
+
+  results        Result[]
+  feePayments    FeePayment[]
+  departmentAssignment StudentDepartment?
+  remarks StudentRemark[]
+
+  @@unique([email, schoolId])
+  @@unique([studentId, schoolId])
+}
+// ─── Subject ──────────────────────────────────────────
+enum SubjectType {
+  GENERAL     // Primary and JSS subjects
+  CORE        // SS core (every student)
+  DEPARTMENT  // SS department subject
+  VOCATIONAL  // SS vocational
+  OPTIONAL    // SS optional (student picks 1 of 2)
+}
+
+model Subject {
+  id           String      @id @default(cuid())
+  name         String
+  subjectType  SubjectType @default(GENERAL)
+
+  // For PRIMARY subjects — linked to class directly
+  classId      String?
+  class        Class?      @relation(fields: [classId], references: [id])
+
+  // For SECONDARY subjects — linked to level
+  level        String?     // "JSS 1", "JSS 2", "SS 1" etc.
+
+  // For SS department/vocational/optional subjects
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  // For optional subjects — group them (same groupId = pick 1 of 2)
+  optionalGroupId String?
+
+  schoolId     String
+  school       School      @relation(fields: [schoolId], references: [id])
+
+  results      Result[]
+
+  @@unique([name, level, departmentId, schoolId])
+
+  chosenByStudents          StudentDepartment[] @relation("ChosenOptional")
+  chosenVocationalByStudents StudentDepartment[] @relation("ChosenVocational")
+}
+
+model StudentDepartment {
+  id                  String     @id @default(cuid())
+  studentId           String     @unique
+  student             Student    @relation(fields: [studentId], references: [id])
+  departmentId        String
+  department          Department @relation(fields: [departmentId], references: [id])
+  optionalSubjectId   String?
+  optionalSubject     Subject?   @relation("ChosenOptional", fields: [optionalSubjectId], references: [id])
+  vocationalSubjectId String?
+  vocationalSubject   Subject?   @relation("ChosenVocational", fields: [vocationalSubjectId], references: [id])
+  createdAt           DateTime   @default(now())
+}
+// ─── Result ───────────────────────────────────────────
+model Result {
+  id        String  @id @default(cuid())
+  studentId String
+  subjectId String
+  termId    String
+  teacherId String
+  caScore   Float?
+  midterm   Float?
+  examScore Float?
+  total     Float?
+  grade     String?
+  remark    String?
+  isLocked  Boolean @default(false)
+
+  student   Student @relation(fields: [studentId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  term      Term    @relation(fields: [termId], references: [id], onDelete: Cascade)
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subjectId, termId])
+}
+
+// ─── Fee Payment ──────────────────────────────────────
+model FeePayment {
+  id          String        @id @default(cuid())
+  studentId   String
+  termId      String
+  receiptUrl  String
+  status      PaymentStatus @default(PENDING)
+  confirmedAt DateTime?
+  confirmedBy String?
+  createdAt   DateTime      @default(now())
+
+  student     Student @relation(fields: [studentId], references: [id])
+ term      Term    @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, termId])
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ─── School Activity ──────────────────────────────────
+model SchoolActivity {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  date      DateTime
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+
+  
+
+// ─── Grading Config ───────────────────────────────────
+model GradingConfig {
+  id        String   @id @default(cuid())
+  grade     String   // "A1", "B2", etc.
+  minScore  Float
+  maxScore  Float
+  remark    String   // "Excellent", "Very Good", etc.
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id])
+
+  @@unique([grade, schoolId])
+}
+
+model StudentOTP {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
