@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     }
 
     const school = await prisma.school.findFirst({
-      where: { clerkOrgId: orgId || '' },
+      where: { clerkOrgId: userId || '' },
     })
 
     if (!school) {
