@@ -48,6 +48,7 @@ export default function PrincipalSignaturePanel({
       const res = await fetch('/api/school/principal', {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       })
 
       const data = await res.json()
