@@ -59,10 +59,14 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    )
+  console.error('API ERROR:', error)
+
+  return NextResponse.json(
+    {
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : String(error),
+    },
+    { status: 500 },
+  )
   }
 }
