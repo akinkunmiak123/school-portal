@@ -5,7 +5,7 @@ import StudentClaimForm from './_components/StudentClaimForm'
 
 export default async function StudentSetupPage() {
   const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+ 
 
   const existing = await prisma.student.findFirst({
     where: { clerkUserId: userId },
