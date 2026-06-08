@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,11 +17,12 @@ function gradeColor(grade: string) {
 }
 
 export default async function StudentResultsPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  const cookieStore = await cookies()
+  const studentId = cookieStore.get('student_session')?.value
+  if (!studentId) redirect('/student-setup')
 
   const student = await prisma.student.findFirst({
-    where: { clerkUserId: userId },
+    where: { id: studentId }, // ← was: clerkUserId: userId
     include: {
       class: true,
       school: {

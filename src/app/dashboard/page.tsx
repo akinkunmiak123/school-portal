@@ -104,107 +104,115 @@ export default async function DashboardPage() {
     },
   ]
 
-  return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {currentSession?.name ?? 'No session set'} —{' '}
-            {currentTerm?.name ?? 'No term set'}
-          </p>
-        </div>
-        <Badge
-          variant="outline"
-          className="text-green-700 border-green-300 bg-green-50"
-        >
-          ● Live
-        </Badge>
-      </div>
+ return (
+   <div className="space-y-6">
+     {/* Page header */}
+     <div className="flex items-center justify-between">
+       <div>
+         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+           Dashboard
+         </h1>
+         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+           {currentSession?.name ?? 'No session set'} —{' '}
+           {currentTerm?.name ?? 'No term set'}
+         </p>
+       </div>
+       <Badge
+         variant="outline"
+         className="text-green-700 border-green-300 bg-green-50 dark:text-green-400 dark:border-green-500/30 dark:bg-green-500/10"
+       >
+         ● Live
+       </Badge>
+     </div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Card key={stat.label}>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">{stat.label}</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">
-                      {stat.value}
-                    </p>
-                  </div>
-                  <div
-                    className={`w-12 h-12 rounded-full ${stat.bg} flex items-center justify-center`}
-                  >
-                    <Icon className={`w-6 h-6 ${stat.color}`} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+     {/* Stats grid */}
+     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+       {stats.map((stat) => {
+         const Icon = stat.icon
+         return (
+           <Card
+             key={stat.label}
+             className="dark:bg-white/[0.04] dark:border-white/[0.06]"
+           >
+             <CardContent className="pt-6">
+               <div className="flex items-center justify-between">
+                 <div>
+                   <p className="text-sm text-gray-500 dark:text-gray-400">
+                     {stat.label}
+                   </p>
+                   <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                     {stat.value}
+                   </p>
+                 </div>
+                 <div
+                   className={`w-12 h-12 rounded-full ${stat.bg} dark:bg-white/[0.08] flex items-center justify-center`}
+                 >
+                   <Icon className={`w-6 h-6 ${stat.color}`} />
+                 </div>
+               </div>
+             </CardContent>
+           </Card>
+         )
+       })}
+     </div>
 
-      {/* Pending payments alert */}
-      {pendingPayments > 0 && (
-        <Card className="border-orange-200 bg-orange-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-orange-600" />
-              <div>
-                <p className="font-semibold text-orange-900">
-                  {pendingPayments} fee payment{pendingPayments > 1 ? 's' : ''}{' '}
-                  awaiting approval
-                </p>
-                <p className="text-sm text-orange-700">
-                  Review and approve student fee receipts to grant result
-                  access.
-                </p>
-              </div>
-              <Link
-                href="/dashboard/payments"
-                className="ml-auto text-sm font-medium text-orange-700 underline"
-              >
-                Review now →
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+     {/* Pending payments alert */}
+     {pendingPayments > 0 && (
+       <Card className="border-orange-200 bg-orange-50 dark:border-orange-500/20 dark:bg-orange-500/10">
+         <CardContent className="pt-6">
+           <div className="flex items-center gap-3">
+             <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+             <div>
+               <p className="font-semibold text-orange-900 dark:text-orange-300">
+                 {pendingPayments} fee payment{pendingPayments > 1 ? 's' : ''}{' '}
+                 awaiting approval
+               </p>
+               <p className="text-sm text-orange-700 dark:text-orange-400">
+                 Review and approve student fee receipts to grant result access.
+               </p>
+             </div>
+             <Link
+               href="/dashboard/payments"
+               className="ml-auto text-sm font-medium text-orange-700 dark:text-orange-400 underline"
+             >
+               Review now →
+             </Link>
+           </div>
+         </CardContent>
+       </Card>
+     )}
 
-      {/* Quick actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {quickActions.map((action) => {
-              const Icon = action.icon
-              return (
-                <Link
-                  key={action.label}
-                  href={action.href}
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-center"
-                >
-                  <div
-                    className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center`}
-                  >
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-xs font-medium text-gray-700">
-                    {action.label}
-                  </span>
-                </Link>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
+     {/* Quick actions */}
+     <Card className="dark:bg-white/[0.04] dark:border-white/[0.06]">
+       <CardHeader>
+         <CardTitle className="text-base dark:text-white">
+           Quick Actions
+         </CardTitle>
+       </CardHeader>
+       <CardContent>
+         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+           {quickActions.map((action) => {
+             const Icon = action.icon
+             return (
+               <Link
+                 key={action.label}
+                 href={action.href}
+                 className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 dark:border-white/[0.08] hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors text-center"
+               >
+                 <div
+                   className={`w-10 h-10 ${action.color} rounded-lg flex items-center justify-center`}
+                 >
+                   <Icon className="w-5 h-5 text-white" />
+                 </div>
+                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                   {action.label}
+                 </span>
+               </Link>
+             )
+           })}
+         </div>
+       </CardContent>
+     </Card>
+   </div>
+ )
 }

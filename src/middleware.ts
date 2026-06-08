@@ -7,7 +7,11 @@ const isPublicRoute = createRouteMatcher([
   '/teacher-login(.*)',
   '/teacher-portal(.*)',
   '/api/teacher(.*)',
+  '/api/student(.*)',
+  '/api/upload(.*)', // ← add this
+  '/api/payments(.*)', // ← add this
   '/student-setup(.*)',
+  '/portal(.*)',
 ])
 
 export default clerkMiddleware(async (auth, req) => {

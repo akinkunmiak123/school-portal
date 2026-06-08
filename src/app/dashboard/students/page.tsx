@@ -81,10 +81,10 @@ export default async function StudentsPage({
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Students
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {totalCount} student{totalCount !== 1 ? 's' : ''} enrolled
             {students.length !== totalCount && (
-              <span className="ml-1 text-blue-600">
+              <span className="ml-1 text-blue-600 dark:text-blue-400">
                 · showing {students.length}
               </span>
             )}
@@ -102,10 +102,10 @@ export default async function StudentsPage({
       <StudentsFilter classes={assignableClasses} />
 
       {students.length === 0 ? (
-        <Card>
+        <Card className="dark:bg-white/[0.04] dark:border-white/[0.06]">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <GraduationCap className="w-12 h-12 text-gray-300 mb-4" />
-            <p className="text-gray-500 font-medium">
+            <GraduationCap className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4" />
+            <p className="text-gray-500 dark:text-gray-400 font-medium">
               {totalCount === 0
                 ? 'No students yet'
                 : 'No students match your filter'}
@@ -113,33 +113,33 @@ export default async function StudentsPage({
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="dark:bg-white/[0.04] dark:border-white/[0.06]">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-800">
-                  <th className="text-left p-4 font-medium text-gray-500">
+                <tr className="border-b border-gray-200 dark:border-white/[0.06]">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Student ID
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Name
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Email
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Class
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Department
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Default Password
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500">
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400">
                     Status
                   </th>
-                  <th className="text-left p-4 font-medium text-gray-500"></th>
+                  <th className="text-left p-4 font-medium text-gray-500 dark:text-gray-400"></th>
                 </tr>
               </thead>
               <tbody>
@@ -148,7 +148,7 @@ export default async function StudentsPage({
                   return (
                     <tr
                       key={student.id}
-                      className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      className="border-b border-gray-100 dark:border-white/[0.06] hover:bg-gray-50 dark:hover:bg-white/[0.04]"
                     >
                       <td className="p-4 font-mono text-xs text-gray-600 dark:text-gray-400">
                         {student.studentId}
@@ -160,7 +160,12 @@ export default async function StudentsPage({
                         {student.email}
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline">{student.class.name}</Badge>
+                        <Badge
+                          variant="outline"
+                          className="dark:border-white/[0.12] dark:text-gray-300"
+                        >
+                          {student.class.name}
+                        </Badge>
                       </td>
                       <td className="p-4">
                         {isSSStudent ? (
@@ -181,26 +186,30 @@ export default async function StudentsPage({
                             }
                           />
                         ) : (
-                          <span className="text-xs text-gray-400">—</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            —
+                          </span>
                         )}
                       </td>
                       <td className="p-4">
                         {student.defaultPassword ? (
-                          <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-gray-700 dark:text-gray-300">
+                          <span className="font-mono text-xs bg-gray-100 dark:bg-white/[0.08] px-2 py-1 rounded text-gray-700 dark:text-gray-300">
                             {student.clerkUserId
                               ? '••••••••'
                               : student.defaultPassword}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-400">—</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            student.clerkUserId —
+                          </span>
                         )}
                       </td>
                       <td className="p-4">
                         <Badge
                           className={
                             student.clerkUserId
-                              ? 'bg-green-100 text-green-700 border-green-200'
-                              : ''
+                              ? 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20'
+                              : 'dark:bg-white/[0.06] dark:text-gray-400'
                           }
                           variant={
                             student.clerkUserId ? 'default' : 'secondary'

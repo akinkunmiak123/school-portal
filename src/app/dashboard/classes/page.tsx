@@ -50,7 +50,7 @@ export default async function ClassesPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Classes
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {school.classes.filter((c) => c.name !== c.level).length} active
             classes
           </p>
@@ -73,10 +73,12 @@ export default async function ClassesPage() {
           </div>
 
           {primaryClasses.length === 0 ? (
-            <Card>
+            <Card className="dark:bg-white/[0.04] dark:border-white/[0.06]">
               <CardContent className="flex flex-col items-center justify-center py-10">
-                <BookOpen className="w-10 h-10 text-gray-300 mb-3" />
-                <p className="text-gray-400 text-sm">No primary classes yet</p>
+                <BookOpen className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3" />
+                <p className="text-gray-400 dark:text-gray-500 text-sm">
+                  No primary classes yet
+                </p>
               </CardContent>
             </Card>
           ) : (
@@ -113,7 +115,7 @@ export default async function ClassesPage() {
                     />
                   </div>
                   {arms.length === 0 ? (
-                    <p className="text-xs text-gray-400 pl-2">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 pl-2">
                       No arms yet — add JSS 1A, JSS 1B etc.
                     </p>
                   ) : (
@@ -180,7 +182,7 @@ function ClassCard({
   showDelete?: boolean
 }) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow dark:bg-white/[0.04] dark:border-white/[0.06]">
       <CardContent className="pt-4 pb-4">
         <div className="flex items-start justify-between">
           <div>
@@ -188,11 +190,11 @@ function ClassCard({
               {cls.name}
             </p>
             <div className="flex items-center gap-3 mt-2">
-              <span className="flex items-center gap-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                 <Users className="w-3 h-3" />
                 {cls.students.length} students
               </span>
-              <span className="flex items-center gap-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                 <BookOpen className="w-3 h-3" />
                 {cls.subjects.length} subjects
               </span>
@@ -200,7 +202,11 @@ function ClassCard({
             {cls.teachers.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {cls.teachers.map((ct: any) => (
-                  <Badge key={ct.id} variant="secondary" className="text-xs">
+                  <Badge
+                    key={ct.id}
+                    variant="secondary"
+                    className="text-xs dark:bg-white/[0.08] dark:text-gray-300"
+                  >
                     {ct.teacher.firstName} {ct.teacher.lastName}
                   </Badge>
                 ))}

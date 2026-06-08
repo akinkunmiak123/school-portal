@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
 import { UserButton } from '@clerk/nextjs'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { GraduationCap, BookOpen, Home } from 'lucide-react'
 import Link from 'next/link'
 
@@ -70,6 +71,7 @@ export default async function TeacherPortalLayout({
             >
               {teacher.role === 'YEAR_TUTOR' ? 'Year Tutor' : 'Class Teacher'}
             </span>
+             <ThemeToggle />
             {/* Sign out button */}
             <form action="/api/teacher/signout" method="POST">
               <button

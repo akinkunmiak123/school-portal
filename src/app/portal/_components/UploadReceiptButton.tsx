@@ -21,7 +21,13 @@ import {
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
-export default function UploadReceiptButton({ termId }: { termId: string }) {
+export default function UploadReceiptButton({
+  termId,
+  existingStatus,
+}: {
+  termId: string
+  existingStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | null
+}) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState<File | null>(null)
@@ -48,7 +54,7 @@ export default function UploadReceiptButton({ termId }: { termId: string }) {
 
     if (selected.size > MAX_FILE_SIZE) {
       setError(
-        `File is too large (${(selected.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed is 2MB. Please compress your file and try again.`
+        `File is too large (${(selected.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed is 2MB. Please compress your file and try again.`,
       )
       e.target.value = ''
       return
@@ -123,6 +129,27 @@ export default function UploadReceiptButton({ termId }: { termId: string }) {
 
   const fileSizeMB = file ? (file.size / (1024 * 1024)).toFixed(1) : null
 
+  // Replace the return block:
+  const isLocked = existingStatus === 'PENDING' || existingStatus === 'APPROVED'
+
+  if (isLocked) {
+    return (
+      <div className="flex items-center gap-2">
+        {existingStatus === 'APPROVED' ? (
+          <span className="flex items-center gap-1.5 text-sm text-green-600 font-medium">
+            <CheckCircle className="w-4 h-4" />
+            Receipt Approved
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-sm text-yellow-600 font-medium">
+            <Loader2 className="w-4 h-4" />
+            Awaiting Review
+          </span>
+        )}
+      </div>
+    )
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
@@ -144,8 +171,8 @@ export default function UploadReceiptButton({ termId }: { termId: string }) {
                 Receipt Submitted!
               </p>
               <p className="text-sm text-gray-500 text-center">
-                Your receipt has been sent to the admin for review. You will
-                get access to your results once approved.
+                Your receipt has been sent to the admin for review. You will get
+                access to your results once approved.
               </p>
             </div>
           ) : (
@@ -210,8 +237,8 @@ export default function UploadReceiptButton({ termId }: { termId: string }) {
                     {progress < 50
                       ? 'Uploading file...'
                       : progress < 90
-                      ? 'Saving receipt...'
-                      : 'Almost done...'}
+                        ? 'Saving receipt...'
+                        : 'Almost done...'}
                   </p>
                 </div>
               )}
@@ -233,10 +260,7 @@ export default function UploadReceiptButton({ termId }: { termId: string }) {
                 >
                   Cancel
                 </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={uploading || !file}
-                >
+                <Button onClick={handleSubmit} disabled={uploading || !file}>
                   {uploading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

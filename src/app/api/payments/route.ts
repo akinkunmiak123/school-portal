@@ -1,25 +1,29 @@
-import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { cookies } from 'next/headers'
+
+
+export const runtime = 'nodejs'        // add this
+export const dynamic = 'force-dynamic' // add this
+
 
 export async function POST(req: Request) {
   try {
-    const { userId } = await auth()
-    if (!userId)
+    const cookieStore = await cookies()
+    const studentId = cookieStore.get('student_session')?.value
+    if (!studentId)
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { receiptUrl, termId } = await req.json()
-
-    // Find student by clerkUserId
     const student = await prisma.student.findFirst({
-      where: { clerkUserId: userId },
+      where: { id: studentId },
     })
-    if (!student) {
+    if (!student)
       return NextResponse.json(
         { error: 'Student record not found' },
         { status: 404 },
       )
-    }
+
+    const { receiptUrl, termId } = await req.json()
 
     // Check if already submitted
     const existing = await prisma.feePayment.findFirst({
@@ -27,7 +31,6 @@ export async function POST(req: Request) {
     })
 
     if (existing) {
-      // Update receipt if rejected
       if (existing.status === 'REJECTED') {
         const updated = await prisma.feePayment.update({
           where: { id: existing.id },

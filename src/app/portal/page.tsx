@@ -1,4 +1,3 @@
-import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,13 +12,16 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import UploadReceiptButton from './_components/UploadReceiptButton'
+import { cookies } from 'next/headers'
 
 export default async function PortalPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+
+  const cookieStore = await cookies()
+  const studentId = cookieStore.get('student_session')?.value
+  if (!studentId) redirect('/student-setup')
 
   const student = await prisma.student.findFirst({
-    where: { clerkUserId: userId },
+    where: { id: studentId },
     include: {
       class: true,
       school: {
@@ -116,7 +118,12 @@ export default async function PortalPage() {
               </div>
             </div>
             {(paymentStatus === 'NONE' || paymentStatus === 'REJECTED') &&
-              currentTerm && <UploadReceiptButton termId={currentTerm.id} />}
+              currentTerm && (
+                <UploadReceiptButton
+                  termId={currentTerm.id}
+                  existingStatus={currentPayment?.status ?? null}
+                />
+              )}
             {paymentStatus === 'APPROVED' && (
               <Link href="/portal/results">
                 <Badge className="bg-green-600 text-white hover:bg-green-700 cursor-pointer px-4 py-2">

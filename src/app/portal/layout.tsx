@@ -1,28 +1,29 @@
-import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { UserButton } from '@clerk/nextjs'
+import { cookies } from 'next/headers'
 import { GraduationCap } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
+
+async function getStudentFromCookie() {
+  const cookieStore = await cookies()
+  const studentId = cookieStore.get('student_session')?.value
+  if (!studentId) return null
+
+  return await prisma.student.findFirst({
+    where: { id: studentId },
+    include: {
+      class: true,
+      school: true,
+    },
+  })
+}
 
 export default async function PortalLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
-
-  const student = await prisma.student.findFirst({
-    where: { clerkUserId: userId },
-    include: {
-      class: true,
-      school: true,
-    },
-  })
-
-  if (!student) redirect('/student-setup')
-
-  // Force password change if not done yet
+  const student = await getStudentFromCookie()
   if (!student) redirect('/student-setup')
 
   return (
@@ -40,11 +41,20 @@ export default async function PortalLayout({
               </p>
             </div>
           </div>
+
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">
               {student.class.name}
             </span>
-            <UserButton />
+            <form action="/api/student/signout" method="POST">
+              <button
+                type="submit"
+                className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+              >
+                Sign out
+              </button>
+            </form>
           </div>
         </div>
       </header>

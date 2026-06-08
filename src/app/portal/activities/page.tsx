@@ -1,15 +1,16 @@
-import { auth } from '@clerk/nextjs/server'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { Card, CardContent } from '@/components/ui/card'
 import { Calendar } from 'lucide-react'
 
 export default async function ActivitiesPage() {
-  const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  const cookieStore = await cookies()
+  const studentId = cookieStore.get('student_session')?.value
+  if (!studentId) redirect('/student-setup')
 
   const student = await prisma.student.findFirst({
-    where: { clerkUserId: userId },
+    where: { id: studentId },
     include: {
       school: {
         include: {
@@ -18,7 +19,7 @@ export default async function ActivitiesPage() {
       },
     },
   })
-
+  
   if (!student) redirect('/student-setup')
 
   const activities = student.school.activities
