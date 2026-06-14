@@ -20,15 +20,23 @@ export default function DownloadMyReportCard({
     setLoading(true)
     setError('')
     try {
-      const res = await fetch(`/api/report-card/${studentId}?termId=${termId}`)
+    const res = await fetch(`/api/report-card/${studentId}?termId=${termId}`)
 
-      if (!res.ok) {
-        const data = await res.json()
-        setError(data.error || 'Failed to generate report card')
-        return
-      }
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error || 'Failed to generate report card')
+      return
+    }
 
-      const blob = await res.blob()
+    const contentType = res.headers.get('content-type')
+    if (!contentType?.includes('application/pdf')) {
+      setError(
+        'PDF generation failed on the server (received HTML fallback). Check server logs.',
+      )
+      return
+    }
+
+    const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
