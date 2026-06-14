@@ -16,45 +16,40 @@ export async function GET(
       return NextResponse.json({ error: 'termId required' }, { status: 400 })
 
     // Check auth — admin, student, or teacher cookie
-    const { userId } = await auth()
-    const cookieStore = await cookies()
-    const teacherCookieId = cookieStore.get('teacher_session')?.value
+  const { userId } = await auth()
+  const cookieStore = await cookies()
+  const teacherCookieId = cookieStore.get('teacher_session')?.value
+  const studentCookieId = cookieStore.get('student_session')?.value
 
-    let isAuthorized = false
-    let school: any = null
+   let isAuthorized = false
+   let school: any = null
 
-    if (userId) {
-      // Check if admin
-      school = await prisma.school.findFirst({
-        where: { clerkOrgId: userId },
-      })
-      if (school) isAuthorized = true
+   if (userId) {
+     // Check if admin
+     school = await prisma.school.findFirst({
+       where: { clerkOrgId: userId },
+     })
+     if (school) isAuthorized = true
+   }
 
-      // Check if student themselves
-      if (!isAuthorized) {
-        const student = await prisma.student.findFirst({
-          where: { clerkUserId: userId, id: studentId },
-        })
-        if (student) {
-          // Verify fee paid
-          const payment = await prisma.feePayment.findFirst({
-            where: { studentId, termId, status: 'APPROVED' },
-          })
-          if (payment) isAuthorized = true
-        }
-      }
-    }
+   // Check if student themselves (cookie-based)
+   if (!isAuthorized && studentCookieId && studentCookieId === studentId) {
+     const payment = await prisma.feePayment.findFirst({
+       where: { studentId, termId, status: 'APPROVED' },
+     })
+     if (payment) isAuthorized = true
+   }
 
-    if (!isAuthorized && teacherCookieId) {
-      const teacher = await prisma.teacher.findFirst({
-        where: { id: teacherCookieId },
-      })
-      if (teacher) isAuthorized = true
-    }
+   if (!isAuthorized && teacherCookieId) {
+     const teacher = await prisma.teacher.findFirst({
+       where: { id: teacherCookieId },
+     })
+     if (teacher) isAuthorized = true
+   }
 
-    if (!isAuthorized) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+   if (!isAuthorized) {
+     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+   }
 
     // Fetch student data
     const student = await prisma.student.findUnique({

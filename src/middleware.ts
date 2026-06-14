@@ -8,8 +8,9 @@ const isPublicRoute = createRouteMatcher([
   '/teacher-portal(.*)',
   '/api/teacher(.*)',
   '/api/student(.*)',
-  '/api/upload(.*)', // ← add this
-  '/api/payments(.*)', // ← add this
+  '/api/upload(.*)', 
+  '/api/payments(.*)', 
+  '/api/report-card(.*)', 
   '/student-setup(.*)',
   '/portal(.*)',
 ])
