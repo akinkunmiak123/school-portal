@@ -154,11 +154,12 @@ export async function GET(
           headless: true,
         })
       } else {
-        const puppeteer = await import('puppeteer')
-        browser = await (puppeteer as any).default.launch({
-          headless: true,
-          args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        })
+       const puppeteerModule = await import('puppeteer')
+const puppeteer = puppeteerModule.default ?? puppeteerModule
+browser = await puppeteer.launch({
+  headless: true,
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+})
       }
 
       const page = await browser.newPage()
@@ -170,12 +171,12 @@ export async function GET(
       })
       await browser.close()
 
-      return new NextResponse(pdf, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="report-card-${student.studentId}-${term.name.replace(' ', '-')}.pdf"`,
-        },
-      })
+    return new NextResponse(Buffer.from(pdf) as unknown as BodyInit, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="report-card-${student.studentId}-${term.name.replace(' ', '-')}.pdf"`,
+      },
+    })
     } catch (err) {
       if (browser) await browser.close()
       console.error('PDF error:', err)
