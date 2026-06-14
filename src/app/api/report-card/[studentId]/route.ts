@@ -145,22 +145,24 @@ export async function GET(
     let browser
     try {
       const isProd = process.env.NODE_ENV === 'production'
-      if (isProd) {
-        const chromium = await import('@sparticuz/chromium')
-        const puppeteer = await import('puppeteer-core')
-        browser = await puppeteer.default.launch({
-          args: chromium.default.args,
-          executablePath: await chromium.default.executablePath(),
-          headless: true,
-        })
-      } else {
-       const puppeteerModule = await import('puppeteer')
-const puppeteer = puppeteerModule.default ?? puppeteerModule
-browser = await puppeteer.launch({
-  headless: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
-})
-      }
+   if (isProd) {
+     const chromium = await import('@sparticuz/chromium-min')
+     const puppeteer = await import('puppeteer-core')
+     browser = await puppeteer.default.launch({
+       args: chromium.default.args,
+       executablePath: await chromium.default.executablePath(
+         'https://github.com/Sparticuz/chromium/releases/download/v148.0.0/chromium-v148.0.0-pack.tar',
+       ),
+       headless: true,
+     })
+   } else {
+     const puppeteerModule = await import('puppeteer')
+     const puppeteer = puppeteerModule.default ?? puppeteerModule
+     browser = await puppeteer.launch({
+       headless: true,
+       args: ['--no-sandbox', '--disable-setuid-sandbox'],
+     })
+   }
 
       const page = await browser.newPage()
       await page.setContent(html, { waitUntil: 'networkidle0' })
