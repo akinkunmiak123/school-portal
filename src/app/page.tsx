@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   GraduationCap,
@@ -7,45 +10,90 @@ import {
   Shield,
   ArrowRight,
   Check,
+  Menu,
+  X,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function HomePage() {
+    const [isOpen, setIsOpen] = useState(false)
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          {/* Logo */}
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
               <GraduationCap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-base text-gray-900 dark:text-white tracking-tight">
-              SchoolPortal
-            </span>
+            <span className="font-bold text-base">SchoolPortal</span>
           </div>
+
+          {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-1 text-sm">
             <ThemeToggle />
+
             <Link
               href="/student-setup"
-              className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="px-3 py-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white"
             >
               Student
             </Link>
+
             <Link
               href="/teacher-login"
-              className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="px-3 py-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white"
             >
               Teachers
             </Link>
+
             <Link
               href="/dashboard"
-              className="ml-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="ml-2 px-4 py-1.5 bg-blue-600 text-white rounded-lg"
             >
               Admin
             </Link>
           </div>
+
+          {/* Mobile button */}
+          <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile menu */}
+        {isOpen && (
+          <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+            <div className="flex flex-col p-4 space-y-3">
+              <ThemeToggle />
+
+              <Link
+                href="/student-setup"
+                className="py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Student
+              </Link>
+
+              <Link
+                href="/teacher-login"
+                className="py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Teachers
+              </Link>
+
+              <Link
+                href="/dashboard"
+                className="py-2 px-4 bg-blue-600 text-white rounded-lg text-center"
+                onClick={() => setIsOpen(false)}
+              >
+                Admin
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
