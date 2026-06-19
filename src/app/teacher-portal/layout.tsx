@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
-import { UserButton } from '@clerk/nextjs'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { GraduationCap, BookOpen, Home } from 'lucide-react'
+import { GraduationCap, BookOpen, Home, Menu, X } from 'lucide-react'
 import Link from 'next/link'
+import MobileNav from './_components/MobileNav'
 
 async function getTeacherFromCookie() {
   const cookieStore = await cookies()
@@ -28,22 +28,32 @@ export default async function TeacherPortalLayout({
   const teacher = await getTeacherFromCookie()
   if (!teacher) redirect('/teacher-login')
 
+  const roleBadge =
+    teacher.role === 'YEAR_TUTOR'
+      ? { label: 'Year Tutor', className: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400' }
+      : { label: 'Class Teacher', className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400' }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+
+          {/* Left — school + teacher name */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center shrink-0">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <p className="text-xs text-gray-500">{teacher.school.name}</p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+            <div className="min-w-0">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {teacher.school.name}
+              </p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                 {teacher.firstName} {teacher.lastName}
               </p>
             </div>
           </div>
 
+          {/* Centre — desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
             <Link
               href="/teacher-portal"
@@ -61,26 +71,22 @@ export default async function TeacherPortalLayout({
             </Link>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <span
-              className={`text-xs px-2 py-1 rounded-full font-medium ${
-                teacher.role === 'YEAR_TUTOR'
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'bg-blue-100 text-blue-700'
-              }`}
-            >
-              {teacher.role === 'YEAR_TUTOR' ? 'Year Tutor' : 'Class Teacher'}
+          {/* Right — role badge + theme + sign out + mobile hamburger */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className={`hidden sm:inline-flex text-xs px-2 py-1 rounded-full font-medium ${roleBadge.className}`}>
+              {roleBadge.label}
             </span>
-             <ThemeToggle />
-            {/* Sign out button */}
-            <form action="/api/teacher/signout" method="POST">
+            <ThemeToggle />
+            <form action="/api/teacher/signout" method="POST" className="hidden md:block">
               <button
                 type="submit"
-                className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition-colors"
+                className="text-xs text-gray-500 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:text-red-400 transition-colors"
               >
                 Sign out
               </button>
             </form>
+            {/* Mobile hamburger — client component */}
+            <MobileNav role={teacher.role} roleBadge={roleBadge} />
           </div>
         </div>
       </header>
