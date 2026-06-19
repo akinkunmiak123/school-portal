@@ -45,7 +45,7 @@ export default async function ClassesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Classes
@@ -55,18 +55,20 @@ export default async function ClassesPage() {
             classes
           </p>
         </div>
-        <SchoolTypeSelector
-          schoolId={school.id}
-          currentType={school.schoolType}
-        />
+        <div className="self-start sm:self-auto">
+          <SchoolTypeSelector
+            schoolId={school.id}
+            currentType={school.schoolType}
+          />
+        </div>
       </div>
 
       {/* PRIMARY SECTION */}
       {showPrimary && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-green-500 inline-block" />
+              <span className="w-3 h-3 rounded-full bg-green-500 inline-block shrink-0" />
               Primary Classes
             </h2>
             <AddPrimaryClassButton schoolId={school.id} />
@@ -97,14 +99,14 @@ export default async function ClassesPage() {
           {/* JSS */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
+              <span className="w-3 h-3 rounded-full bg-blue-500 inline-block shrink-0" />
               Junior Secondary (JSS)
             </h2>
             {jssLevels.map((level) => {
               const arms = getArms(level)
               return (
                 <div key={level} className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                       {level}
                     </h3>
@@ -133,14 +135,14 @@ export default async function ClassesPage() {
           {/* SS */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-purple-500 inline-block" />
+              <span className="w-3 h-3 rounded-full bg-purple-500 inline-block shrink-0" />
               Senior Secondary (SS)
             </h2>
             {ssLevels.map((level) => {
               const arms = getArms(level)
               return (
                 <div key={level} className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                       {level}
                     </h3>
@@ -151,7 +153,7 @@ export default async function ClassesPage() {
                     />
                   </div>
                   {arms.length === 0 ? (
-                    <p className="text-xs text-gray-400 pl-2">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 pl-2">
                       No arms yet — add SS 1A, SS 1B etc.
                     </p>
                   ) : (
@@ -184,18 +186,18 @@ function ClassCard({
   return (
     <Card className="hover:shadow-md transition-shadow dark:bg-white/[0.04] dark:border-white/[0.06]">
       <CardContent className="pt-4 pb-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-900 dark:text-white truncate">
               {cls.name}
             </p>
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
               <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                <Users className="w-3 h-3" />
+                <Users className="w-3 h-3 shrink-0" />
                 {cls.students.length} students
               </span>
               <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                <BookOpen className="w-3 h-3" />
+                <BookOpen className="w-3 h-3 shrink-0" />
                 {cls.subjects.length} subjects
               </span>
             </div>
@@ -213,7 +215,7 @@ function ClassCard({
               </div>
             )}
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1 shrink-0">
             {showEdit && (
               <EditClassButton classId={cls.id} currentName={cls.name} />
             )}
