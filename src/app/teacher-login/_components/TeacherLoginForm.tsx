@@ -311,7 +311,10 @@ export default function TeacherLoginForm() {
 
           <p className="text-center text-xs text-gray-400 mt-2">
             Not a teacher?{' '}
-            <a href="/sign-in" className="text-blue-600 hover:underline">
+            <a
+              href={process.env.NEXT_PUBLIC_APP_URL || '/sign-in'}
+              className="text-blue-600 hover:underline"
+            >
               Student / Admin login →
             </a>
           </p>
