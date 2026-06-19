@@ -55,9 +55,10 @@ export default function SignatureUpload({
   return (
     <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
       <CardContent className="pt-4 pb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {/* Left — icon + text */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center shrink-0">
               <Pen className="w-5 h-5 text-blue-600" />
             </div>
             <div>
@@ -72,12 +73,13 @@ export default function SignatureUpload({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Right — preview + upload button */}
+          <div className="flex items-center gap-3 pl-[52px] sm:pl-0">
             {preview && (
               <img
                 src={preview}
                 alt="Your signature"
-                className="h-10 object-contain border border-blue-200 rounded bg-white px-2"
+                className="h-10 object-contain border border-blue-200 rounded bg-white px-2 max-w-[120px]"
               />
             )}
             <label className="cursor-pointer">
@@ -92,7 +94,7 @@ export default function SignatureUpload({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                className="border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900"
                 disabled={uploading}
                 asChild
               >

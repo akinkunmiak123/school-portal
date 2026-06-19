@@ -155,32 +155,32 @@ export default async function TeacherClassResultsPage({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
           <Link
             href="/teacher-portal/results"
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 mt-1 shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {cls.name} — Results
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {term?.name} · {cls.students.length} students · {avgSubjects}{' '}
               subjects avg
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 pl-8 sm:pl-0 self-start sm:self-auto">
           {isLocked && (
-            <Badge className="bg-red-100 text-red-700 border-red-200">
+            <Badge className="bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">
               🔒 Locked by Admin
             </Badge>
           )}
           {teacher.role === 'CLASS_TEACHER' && (
-            <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20">
               Can add remarks
             </Badge>
           )}
