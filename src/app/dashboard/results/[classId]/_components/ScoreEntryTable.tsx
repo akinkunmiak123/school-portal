@@ -187,7 +187,7 @@ export default function ScoreEntryTable({
                 <p className="font-semibold text-gray-900 dark:text-white">
                   {student.lastName}, {student.firstName}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {student.studentId} · {studentSubjects.length} subjects
                 </p>
               </div>
@@ -208,25 +208,25 @@ export default function ScoreEntryTable({
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-800">
-                    <th className="text-left px-4 py-2 font-medium text-gray-500 w-48">
+                    <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400 w-32 sm:w-48">
                       Subject
                     </th>
-                    <th className="text-center px-2 py-2 font-medium text-gray-500 w-24">
+                    <th className="text-center px-2 py-2 font-medium text-gray-500 dark:text-gray-400 min-w-[80px] sm:w-24">
                       CA <span className="text-xs font-normal">/20</span>
                     </th>
-                    <th className="text-center px-2 py-2 font-medium text-gray-500 w-24">
+                    <th className="text-center px-2 py-2 font-medium text-gray-500 dark:text-gray-400 min-w-[80px] sm:w-24">
                       Midterm <span className="text-xs font-normal">/20</span>
                     </th>
-                    <th className="text-center px-2 py-2 font-medium text-gray-500 w-24">
+                    <th className="text-center px-2 py-2 font-medium text-gray-500 dark:text-gray-400 min-w-[80px] sm:w-24">
                       Exam <span className="text-xs font-normal">/60</span>
                     </th>
-                    <th className="text-center px-2 py-2 font-medium text-gray-500 w-20">
+                    <th className="text-center px-2 py-2 font-medium text-gray-500 dark:text-gray-400 min-w-[52px] sm:w-20">
                       Total
                     </th>
-                    <th className="text-center px-2 py-2 font-medium text-gray-500 w-20">
+                    <th className="text-center px-2 py-2 font-medium text-gray-500 dark:text-gray-400 min-w-[52px] sm:w-20">
                       Grade
                     </th>
-                    {!isLocked && <th className="w-20"></th>}
+                    {!isLocked && <th className="min-w-[52px] sm:w-20"></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -260,9 +260,9 @@ export default function ScoreEntryTable({
                         {(['ca', 'mid', 'exam'] as const).map((field) => (
                           <td key={field} className="px-2 py-2">
                             <Input
-                              type="number"
-                              min={0}
-                              max={field === 'exam' ? 60 : 20}
+                              type="text"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
                               value={s[field]}
                               onChange={(e) =>
                                 updateScore(
@@ -273,7 +273,7 @@ export default function ScoreEntryTable({
                                 )
                               }
                               disabled={isLocked}
-                              className="w-full text-center h-8 text-sm disabled:opacity-50"
+                              className="w-full min-w-[64px] text-center h-8 text-sm disabled:opacity-50"
                               placeholder="0"
                             />
                           </td>
